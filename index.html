@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Alan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Montserrat:wght@300;500;700&family=Sacramento&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1c1412;
+            font-family: 'Montserrat', sans-serif;
+            color: #e6dfd5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Contenedor de hojas animadas */
+        #leaf-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .leaf {
+            position: absolute;
+            top: -10%;
+            user-select: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) translateX(120px) rotate(360deg);
+                opacity: 0.2;
+            }
+        }
+
+        /* ESCENA 1: SOBRE */
+        .scene {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .scene.active {
+            display: flex;
+        }
+
+        .envelope-title {
+            font-family: 'Sacramento', cursive;
+            font-size: 3.5rem;
+            color: #e8a56c;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .envelope {
+            width: 320px;
+            height: 220px;
+            background: #d7c0a3;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 2px solid #b89f81;
+        }
+
+        .envelope:hover {
+            transform: scale(1.03);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 120px solid #c4ab8e;
+            transform-origin: top;
+            transition: transform 0.5s ease;
+        }
+
+        .seal {
+            width: 65px;
+            height: 65px;
+            background: radial-gradient(circle, #a83232 0%, #701c1c 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #f1d59b;
+            font-family: 'Sacramento', cursive;
+            font-size: 2.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.4);
+            z-index: 5;
+            border: 2px dashed #7a2222;
+        }
+
+        /* ESCENA 2: RECUERDOS Y MÚSICA */
+        .notes-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            max-width: 700px;
+        }
+
+        .torn-paper {
+            background: #f4eae1;
+            color: #3a2e2b;
+            font-family: 'Caveat', cursive;
+            font-size: 1.4rem;
+            padding: 12px 20px;
+            box-shadow: 3px 5px 12px rgba(0,0,0,0.4);
+            transform: rotate(var(--rot));
+            clip-path: polygon(
+                0% 5%, 15% 0%, 35% 4%, 55% 1%, 75% 5%, 100% 0%,
+                98% 30%, 100% 65%, 97% 95%,
+                80% 98%, 60% 94%, 40% 100%, 20% 96%, 0% 98%,
+                2% 50%
+            );
+            transition: transform 0.2s ease;
+        }
+
+        .torn-paper:hover {
+            transform: scale(1.1) rotate(0deg);
+            z-index: 10;
+        }
+
+        .music-box {
+            background: rgba(45, 34, 30, 0.85);
+            border: 1px solid #c88d57;
+            border-radius: 12px;
+            padding: 18px 25px;
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .music-box h3 {
+            font-size: 0.95rem;
+            color: #e8a56c;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .song-btn {
+            display: inline-block;
+            background: #5c3b28;
+            color: #fceade;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 5px;
+            transition: background 0.3s;
+            border: 1px solid #9c6746;
+        }
+
+        .song-btn:hover {
+            background: #875135;
+        }
+
+        .next-btn {
+            background: none;
+            border: none;
+            color: #e8a56c;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Caveat', cursive;
+            font-size: 1.6rem;
+            transition: transform 0.3s;
+            margin-top: 10px;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .next-leaf-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        /* ESCENA 3: VALE */
+        .coupon-card {
+            background: #2a1f1b;
+            border: 2px dashed #e8a56c;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .coupon-card h2 {
+            font-family: 'Sacramento', cursive;
+            font-size: 3rem;
+            color: #e8a56c;
+            margin-bottom: 15px;
+        }
+
+        .coupon-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #dfd0c0;
+            margin-bottom: 25px;
+        }
+
+        .coupon-sub {
+            font-family: 'Caveat', cursive;
+            font-size: 1.6rem;
+            color: #d17b49;
+        }
+
+        /* ESCENA 4: CARTA FINAL */
+        .letter-card {
+            background: rgba(38, 28, 24, 0.92);
+            border: 1px solid #7c563d;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 650px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .letter-card p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #eddccb;
+            margin-bottom: 20px;
+            text-align: justify;
+            white-space: pre-line;
+        }
+
+        .letter-card .valediction {
+            text-align: right;
+            font-family: 'Sacramento', cursive;
+            font-size: 2.4rem;
+            color: #e8a56c;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="leaf-container"></div>
+
+    <!-- ESCENA 1: SOBRE -->
+    <div class="scene active" id="scene-1">
+        <div class="envelope-title">Para Alan</div>
+        <div class="envelope" onclick="openEnvelope()">
+            <div class="envelope-flap"></div>
+            <div class="seal">M</div>
+        </div>
+    </div>
+
+    <!-- ESCENA 2: RECUERDOS Y CANCIONES -->
+    <div class="scene" id="scene-2">
+        <div class="notes-grid">
+            <div class="torn-paper" style="--rot: -4deg">Date feria</div>
+            <div class="torn-paper" style="--rot: 3deg">Primera Date un desayuno</div>
+            <div class="torn-paper" style="--rot: -2deg">Veamos enfrente de coppel</div>
+            <div class="torn-paper" style="--rot: 5deg">Café abracadabra</div>
+            <div class="torn-paper" style="--rot: -3deg">Los locos Addams</div>
+            <div class="torn-paper" style="--rot: 2deg">Una primera vez</div>
+            <div class="torn-paper" style="--rot: -5deg">Quedar en cinta por hots</div>
+            <div class="torn-paper" style="--rot: 4deg">Una carta</div>
+            <div class="torn-paper" style="--rot: -1deg">Varios peluches</div>
+        </div>
+
+        <div class="music-box">
+            <h3>🎵 Canciones de fondo</h3>
+            <a href="https://open.spotify.com/search/Sweater%20Weather%20The%20Neighbourhood" target="_blank" class="song-btn">▶ Sweater Weather - The Neighbourhood</a>
+            <a href="https://open.spotify.com/search/Triunfamos%20Los%20Panchos" target="_blank" class="song-btn">▶ Triunfamos - Los Panchos</a>
+        </div>
+
+        <button class="next-btn" onclick="goToScene(3)">
+            <span class="next-leaf-icon">🍁</span>
+            <span>Siguiente</span>
+        </button>
+    </div>
+
+    <!-- ESCENA 3: VALE -->
+    <div class="scene" id="scene-3">
+        <div class="coupon-card">
+            <h2>Vale Especial</h2>
+            <p>Un vale de regreso para lo que necesites o quieras.</p>
+            <div class="coupon-sub">Escríbeme para usarlo ✨</div>
+        </div>
+
+        <button class="next-btn" onclick="goToScene(4)" style="margin-top: 25px;">
+            <span class="next-leaf-icon">🍂</span>
+            <span>Leer carta</span>
+        </button>
+    </div>
+
+    <!-- ESCENA 4: CARTA FINAL -->
+    <div class="scene" id="scene-4">
+        <div class="letter-card">
+            <p>Sé que a lo mejor lo intentamos y no lo pudimos lograr pero estoy muy agradecida por que me hayas querido conocer, agradezco mucho la pulsera la guardare muy bien para que nada malo le pase porque me encanto y la ame, agradezco cada detalle, cada mensaje, cada interacción y que me contaras de ti, enserio eres alguien increíble y valoro tu tiempo y dedicación por estar con alguien tan difícil y complicada como yo, mereces todo lo lindo y bello de esta vida, enserio que te quiero y aprecio todo lo que hiciste por mi, te agradezco por lo que hiciste en mi cumpleaños, por los postres deliciosos, por cantarme, por todo en general, igual te agradezco porque quieras o no fuiste parte de mi logro universitario para poder titularme, ya será mi protocolo de titulación y me pone triste un poco no poder compartir mis fotos o las del gato contigo, igual estoy triste/frustrada porque compre el conjunto rosa para usarlo contigo quería verme bonita para ti en ese traje de corazones jjejeje, quería que te sintieras especial ese día que lo usara, muchas gracias por todo y perdón por tan poco amor y forma de demostrar que te quiero, espero en algún momento coincidir o poder hablar se que no tan seguido pero si hablar, me llevo la experiencia de haber tenido un pedacito tuyo, espero te vaya bien en tu trabajo, en los cursos que vayas a tener, en la uni y que termines siendo el mejor programador del mundo, continua siendo genial y un chico increíble.</p>
+            <div class="valediction">Con Cariño Montse...</div>
+        </div>
+    </div>
+
+    <script>
+        // Animación de hojas de otoño
+        function startLeafAnimation() {
+            const container = document.getElementById('leaf-container');
+            const symbols = ['🍂', '🍁', '🍃'];
+            
+            setInterval(() => {
+                const leaf = document.createElement('div');
+                leaf.classList.add('leaf');
+                leaf.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+                leaf.style.left = Math.random() * 100 + 'vw';
+                leaf.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                leaf.style.fontSize = (Math.random() * 1.2 + 1) + 'rem';
+                
+                container.appendChild(leaf);
+
+                setTimeout(() => {
+                    leaf.remove();
+                }, 8000);
+            }, 300);
+        }
+
+        // Navegación de escenas
+        function openEnvelope() {
+            document.getElementById('scene-1').classList.remove('active');
+            document.getElementById('scene-2').classList.add('active');
+            startLeafAnimation();
+        }
+
+        function goToScene(sceneNumber) {
+            document.querySelectorAll('.scene').forEach(scene => scene.classList.remove('active'));
+            document.getElementById('scene-' + sceneNumber).classList.add('active');
+        }
+    </script>
+</body>
+</html>
